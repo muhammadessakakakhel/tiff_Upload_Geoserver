@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Add a WMS source</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <link
+      href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .map-overlay {
+        position: absolute;
+        top: 10px;
+        left: 1200px;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+      }
+
+      .zoom-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .zoom-controls button {
+        margin-bottom: 5px;
+        padding: 5px 10px;
+        font-size: 30px;
+        background-color: black;
+        border: none;
+        border-radius: 3px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        color:white; /* Add this line */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="map-overlay"><h1>This is the WMS layer overlay</h1></div>
+    <div class="zoom-controls">
+      <button id="zoom-in">+</button>
+      <button id="zoom-out">-</button>
+    </div>
+    <script>
+      var map = new maplibregl.Map({
+        container: "map",
+        style:
+          "https://api.maptiler.com/maps/streets-v2/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL", // Replace with your desired map style
+        zoom: 4,
+        center: [-74.5447, 40.6892],
+      });
+
+      map.on("load", function () {
+        map.addSource("wms-test-source", {
+          type: "raster",
+          tiles: [
+            "http://localhost:8080/geoserver/demo1/wms?service=WMS&version=1.1.0&request=GetMap&layers=demo1%3Ashapfile-states&bbox={bbox-epsg-3857}&width=256&height=256&srs=EPSG%3A3857&format=image/png",
+          ],
+          tileSize: 256,
+        });
+        map.addLayer(
+          {
+            id: "wms-test-layer",
+            type: "raster",
+            source: "wms-test-source",
+            paint: {},
+          },
+          "aeroway_fill"
+        );
+      });
+
+      document.getElementById("zoom-in").addEventListener("click", function () {
+        map.zoomIn();
+      });
+
+      document
+        .getElementById("zoom-out")
+        .addEventListener("click", function () {
+          map.zoomOut();
+        });
+    </script>
+  </body>
+</html>
